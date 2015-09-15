@@ -20,8 +20,8 @@ public class TextBuddy {
 	private static final String FILE_CLEARED = "all content deleted from %1$s";
 	private static final String INVALID_COMMAND = "invalid command";
 	private static final String FILE_EMPTY = "%1$s is empty";
-	//private static final String FILE_SORTED = "%1$s is sorted";
-	//private static final String TASK_FOUND = "%1$s task(s) found";
+	private static final String FILE_SORTED = "%1$s is sorted";
+	private static final String TASK_FOUND = "%1$s task(s) found";
 	private static Scanner sc = new Scanner(System.in);
 
 	public static void main(String[] args) {
@@ -49,13 +49,13 @@ public class TextBuddy {
 				clearFile(file_name);
 				break;
 				
-			/*case "sort" :
+			case "sort" :
 				sortFile(file_name);
 				break;
 				
 			case "search" :
 				searchFile(file_name);
-				break;*/
+				break;
 				
 			default :
 				showToUser(INVALID_COMMAND);
@@ -153,5 +153,55 @@ public class TextBuddy {
 			System.out.println(e.getMessage());
 		}
 		showToUser(String.format(FILE_CLEARED, file_name));
+	}
+	
+	public static void sortFile(String file_name) {
+		try {
+			WriteFile data = new WriteFile(file_name);
+			ArrayList<String> textLines = data.Openfile();
+			if (textLines.size() == 0){
+				showToUser(INVALID_COMMAND);
+				showToUser(String.format(FILE_EMPTY, file_name));
+				return;
+			}
+			Collections.sort(textLines);
+			data.clearFile();
+			data.changeValue(true);
+			for (int i = 0; i < textLines.size(); i++) {
+				data.writeToFile(textLines.get(i));
+			}
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+		showToUser(String.format(FILE_SORTED, file_name));
+	}
+	
+	public static void searchFile(String file_name) {
+		try {
+			CharSequence toFind = sc.nextLine();
+			int count = 0;
+			WriteFile data = new WriteFile(file_name);
+			ArrayList<String> textLines = data.Openfile();
+			if (textLines.size() == 0) {
+				showToUser(INVALID_COMMAND);
+				showToUser(String.format(FILE_EMPTY, file_name));
+				return;
+			}
+			ArrayList<String> linesFound = new ArrayList<String>();
+			for (int i = 0; i < textLines.size(); i++) {
+				if (textLines.get(i).contains(toFind)) {
+					linesFound.add(textLines.get(i));
+					count++;
+				}
+			}
+			showToUser(String.format(TASK_FOUND, count));
+			if (count == 0)
+				return;
+			for (int i = 0; i < count; i++) {
+				System.out.println((i + 1) + ". " + linesFound.get(i));
+			}
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 }
